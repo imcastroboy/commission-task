@@ -29,7 +29,6 @@
         "phpunit": "phpunit",
         "fix-cs": "php-cs-fixer fix",
         "test-cs": "php-cs-fixer fix --dry-run -v",
-        "test": ["@phpunit", "@test-cs"],
-        "dev": "php script.php input.csv"
+        "test": ["@phpunit", "@test-cs"]
     }
 }
