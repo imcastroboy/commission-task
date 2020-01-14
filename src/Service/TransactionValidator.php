@@ -4,21 +4,11 @@ declare(strict_types=1);
 
 namespace JACastro\CommissionTask\Service;
 
-use JACastro\CommissionTask\Config\Rate;
-use JACastro\CommissionTask\Config\TransactionDefault;
-use JACastro\CommissionTask\Contract\Validator;
+use JACastro\CommissionTask\Abstracts\ValidatorInterface;
+use JACastro\CommissionTask\Config\App;
 
-class TransactionValidator implements Validator
+class TransactionValidator implements ValidatorInterface
 {
-    private $defaults;
-    private $rates;
-
-    public function __construct()
-    {
-        $this->defaults = new TransactionDefault();
-        $this->rates = new Rate();
-    }
-
     public function isEmpty(string $value)
     {
         if (!isset($value) || $value === '') {
@@ -28,21 +18,21 @@ class TransactionValidator implements Validator
 
     public function validateOperationType(string $value)
     {
-        if (!in_array($value, $this->defaults->getOperationTypes(), true)) {
+        if (!in_array($value, App::OPERATION_TYPES, true)) {
             throw new \Exception(sprintf('%s is not a valid operation type.', $value));
         }
     }
 
     public function validateUserType(string $value)
     {
-        if (!in_array($value, $this->defaults->getUserTypes(), true)) {
+        if (!in_array($value, App::USER_TYPES, true)) {
             throw new \Exception(sprintf('%s is not a valid user type.', $value));
         }
     }
 
     public function validateSupportedCurrencies(string $value)
     {
-        $currencies = array_map('strtolower', array_keys($this->rates->getRates()));
+        $currencies = array_map('strtolower', array_keys(App::CURRENCY_RATES));
 
         if (!in_array(strtolower($value), $currencies, true)) {
             throw new \Exception(sprintf('%s currency is not supported.', $value));

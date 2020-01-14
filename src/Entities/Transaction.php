@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace JACastro\CommissionTask\Entities;
 
-use JACastro\CommissionTask\Contract\TransactionContract;
-use JACastro\CommissionTask\Contract\Validator;
+use JACastro\CommissionTask\Abstracts\MathInterface;
+use JACastro\CommissionTask\Abstracts\TransactionInterface;
+use JACastro\CommissionTask\Abstracts\ValidatorInterface;
+use JACastro\CommissionTask\Config\App;
 
-class Transaction implements TransactionContract
+class Transaction implements TransactionInterface
 {
     private $transaction;
     private $validator;
+    private $math;
 
-    public function __construct(array $transaction, Validator $validator)
-    {
+    public function __construct(
+        array $transaction,
+        ValidatorInterface $validator,
+        MathInterface $math
+    ) {
         $this->transaction = $transaction;
         $this->validator = $validator;
+        $this->math = $math;
     }
 
     public function operationDate(): string
@@ -61,6 +68,14 @@ class Transaction implements TransactionContract
         $this->validator->validateSupportedCurrencies($this->transaction[5]);
 
         return $this->transaction[5];
+    }
+
+    public function convertedAmount()
+    {
+        return $this->math->multiply(
+            $this->amount(),
+            App::CURRENCY_RATES[strtoupper($this->currency())]
+        );
     }
 
     public function setCommissionFee(string $commission): string

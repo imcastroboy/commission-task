@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JACastro\CommissionTask\Contract;
+namespace JACastro\CommissionTask\Abstracts;
 
-interface TransactionContract
+interface TransactionInterface
 {
     public function operationDate(): string;
 

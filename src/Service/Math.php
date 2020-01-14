@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace JACastro\CommissionTask\Service;
 
-class Math
+use JACastro\CommissionTask\Abstracts\MathInterface;
+
+class Math implements MathInterface
 {
     private $scale;
 
@@ -31,5 +33,10 @@ class Math
     public function divide(string $dividend, string $divisor): string
     {
         return bcdiv($dividend, $divisor, $this->scale);
+    }
+
+    public function compare(string $leftOperand, string $rightOperand): int
+    {
+        return bccomp($leftOperand, $rightOperand, $this->scale);
     }
 }

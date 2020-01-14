@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace JACastro\CommissionTask\Service;
 
-use JACastro\CommissionTask\Contract\FileTransaction;
+use JACastro\CommissionTask\Abstracts\FileTransactionInterface;
 use JACastro\CommissionTask\Entities\Transaction;
 
-class CsvFileTransaction implements FileTransaction
+class CsvFileTransaction implements FileTransactionInterface
 {
     private $transactions = [];
 
@@ -17,13 +17,21 @@ class CsvFileTransaction implements FileTransaction
             throw new \Exception('File not found.');
         }
 
-        if (!in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), ['csv'], true)) {
+        if (
+            !in_array(
+                strtolower(pathinfo($file, PATHINFO_EXTENSION)), ['csv'],
+            true)
+        ) {
             throw new \Exception('File type not supported.');
         }
 
         if (($handle = fopen($file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                $this->transactions[] = new Transaction($data, new TransactionValidator());
+                $this->transactions[] = new Transaction(
+                    $data,
+                    new TransactionValidator(),
+                    new Math(2)
+                );
             }
 
             fclose($handle);

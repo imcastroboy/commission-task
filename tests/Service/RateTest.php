@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JACastro\CommissionTask\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
-use JACastro\CommissionTask\Config\Rate;
+use JACastro\CommissionTask\Config\App;
 use JACastro\CommissionTask\Service\Math;
 
 class RateTest extends TestCase
@@ -29,8 +29,8 @@ class RateTest extends TestCase
      */
     public function testRate(string $currency, string $amount, string $expectation)
     {
-        $rate = new Rate($currency);
-        $convertion = $this->math->multiply($rate(), $amount);
+        $rate = App::CURRENCY_RATES[$currency];
+        $convertion = $this->math->multiply($rate, $amount);
 
         $this->assertEquals(
             $expectation,

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JACastro\CommissionTask\Contract;
+namespace JACastro\CommissionTask\Abstracts;
 
-interface Validator
+interface ValidatorInterface
 {
     public function isEmpty(string $value);
 
