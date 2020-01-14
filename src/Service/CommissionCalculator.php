@@ -4,29 +4,79 @@ declare(strict_types=1);
 
 namespace JACastro\CommissionTask\Service;
 
-use JACastro\CommissionTask\Contract\TransactionContract;
+use JACastro\CommissionTask\Abstracts\TransactionInterface;
+use JACastro\CommissionTask\Config\App;
 
 class CommissionCalculator
 {
-    protected $transaction;
+    private $transaction;
+    private $math;
 
-    public function __construct(TransactionContract $transaction)
+    public function __construct(TransactionInterface $transaction, Math $math)
     {
         $this->transaction = $transaction;
+        $this->math = $math;
     }
 
-    public function calculate()
+    public function getCalculatedCommissionFee()
     {
-        $operationType = $this->transaction->operationType();
+        $cashFee = $this->transaction->operationType() === 'cash_in'
+            ? App::COMMISSION_CASH_IN_FEE
+            : App::COMMISSION_CASH_OUT_FEE;
+        $totalFee = $this->calculateFee($cashFee);
 
-        if ($operationType === 'cash_out') {
-            $commission = new CashOutOperation($this->transaction);
-        } elseif ($operationType === 'cash_in') {
-            $commission = new CashInOperation($this->transaction);
+        if ($this->isLegalAndLessMinFeeCashOut($totalFee)) {
+            return App::COMMISSION_MIN_LEGAL_PERSON_FEE;
         }
 
-        $this->transaction->setCommissionFee($commission->getCalculatedCommissionFee());
+        if ($this->isMoreThanMaximumFeeCashIn($totalFee)) {
+            return App::COMMISSION_MAX_CASH_IN_FEE;
+        }
 
-        return $this->transaction;
+        return $totalFee;
+    }
+
+    private function calculateFee(string $commissionFee): string
+    {
+        $result = $this->math->multiply($this->transaction->amount(), $commissionFee);
+
+        return $result;
+    }
+
+    private function isLegalAndLessMinFeeCashOut(string $totalFee): bool
+    {
+        return $this->transaction->operationType() === 'cash_out'
+            && $this->isLegal()
+            && $this->isLessThanMininumFee($totalFee);
+    }
+
+    private function isLessThanMininumFee(string $totalFee): bool
+    {
+        return $this->math->compare(
+            $this->convertCommissionFee($totalFee),
+            App::COMMISSION_MIN_LEGAL_PERSON_FEE
+        ) === -1;
+    }
+
+    private function isMoreThanMaximumFeeCashIn(string $totalFee): bool
+    {
+        return $this->transaction->operationType() === 'cash_in'
+            && $this->math->compare(
+                $this->convertCommissionFee($totalFee),
+                App::COMMISSION_MAX_CASH_IN_FEE
+            ) === 1;
+    }
+
+    private function isLegal(): bool
+    {
+        return $this->transaction->userType() === 'legal';
+    }
+
+    public function convertCommissionFee(string $fee)
+    {
+        return $this->math->multiply(
+            $fee,
+            App::CURRENCY_RATES[strtoupper($this->transaction->currency())]
+        );
     }
 }
