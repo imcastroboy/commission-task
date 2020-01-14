@@ -1,11 +1,11 @@
 # Commission Task
 ## How to setup
-After cloning the repo, make sure to run in your terminal
+After cloning the repo, make sure to run this command in your terminal
 ```
 composer install
 ```
 ## Usage
-Here's an example on how to use the code.
+Here's an example command on how to use the code.
 ```
 php script.php input.csv
 ```
