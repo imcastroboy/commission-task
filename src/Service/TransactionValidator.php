@@ -17,7 +17,7 @@ class TransactionValidator implements ValidatorInterface
         $this->transaction = $transaction;
     }
 
-    public function validated()
+    public function validated(): TransactionInterface
     {
         foreach ($this->transaction->getAttributes() as $transaction) {
             $this->isEmpty($transaction);

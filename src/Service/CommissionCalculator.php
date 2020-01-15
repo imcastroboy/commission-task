@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace JACastro\CommissionTask\Service;
 
+use JACastro\CommissionTask\Abstracts\CommissionCalculatorInterface;
 use JACastro\CommissionTask\Abstracts\TransactionInterface;
 use JACastro\CommissionTask\Config\App;
 
-class CommissionCalculator
+class CommissionCalculator implements CommissionCalculatorInterface
 {
     private $transaction;
     private $math;
@@ -18,7 +19,7 @@ class CommissionCalculator
         $this->math = $math;
     }
 
-    public function getCalculatedCommissionFee()
+    public function getCalculatedCommissionFee(): string
     {
         $cashFee = $this->transaction->operationType() === 'cash_in'
             ? App::COMMISSION_CASH_IN_FEE
@@ -36,7 +37,7 @@ class CommissionCalculator
         return $totalFee;
     }
 
-    private function calculateFee(string $commissionFee): string
+    public function calculateFee(string $commissionFee): string
     {
         $result = $this->math->multiply($this->transaction->amount(), $commissionFee);
 
@@ -72,7 +73,7 @@ class CommissionCalculator
         return $this->transaction->userType() === 'legal';
     }
 
-    public function convertCommissionFee(string $fee)
+    public function convertCommissionFee(string $fee): string
     {
         return $this->math->multiply(
             $fee,

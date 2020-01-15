@@ -52,7 +52,7 @@ class Transaction implements TransactionInterface
         return $this->transaction[5];
     }
 
-    public function convertedAmount()
+    public function convertedAmount(): string
     {
         return $this->math->multiply(
             $this->amount(),
@@ -70,7 +70,7 @@ class Transaction implements TransactionInterface
         return $this->transaction[6];
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->transaction;
     }
