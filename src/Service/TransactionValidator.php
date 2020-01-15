@@ -4,12 +4,33 @@ declare(strict_types=1);
 
 namespace JACastro\CommissionTask\Service;
 
+use JACastro\CommissionTask\Abstracts\TransactionInterface;
 use JACastro\CommissionTask\Abstracts\ValidatorInterface;
 use JACastro\CommissionTask\Config\App;
 
 class TransactionValidator implements ValidatorInterface
 {
-    public function isEmpty(string $value)
+    private $transaction;
+
+    public function __construct(TransactionInterface $transaction)
+    {
+        $this->transaction = $transaction;
+    }
+
+    public function validated()
+    {
+        foreach ($this->transaction->getAttributes() as $transaction) {
+            $this->isEmpty($transaction);
+        }
+
+        $this->validateOperationType($this->transaction->operationType());
+        $this->validateUserType($this->transaction->userType());
+        $this->validateSupportedCurrencies($this->transaction->currency());
+
+        return $this->transaction;
+    }
+
+    public function isEmpty($value)
     {
         if (!isset($value) || $value === '') {
             throw new \Exception('Empty value.');

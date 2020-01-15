@@ -27,11 +27,12 @@ class CsvFileTransaction implements FileTransactionInterface
 
         if (($handle = fopen($file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                $this->transactions[] = new Transaction(
+                $transaction = new Transaction(
                     $data,
-                    new TransactionValidator(),
                     new Math(2)
                 );
+                $transactionValidator = new TransactionValidator($transaction);
+                $this->transactions[] = $transactionValidator->validated();
             }
 
             fclose($handle);
